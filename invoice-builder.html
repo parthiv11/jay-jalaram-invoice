@@ -160,17 +160,18 @@ body {
 
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.g5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 
 /* Items */
 .item-card {
-  background: var(--input-bg);
+  background: linear-gradient(180deg, #111522, #0e111a);
   border: 1px solid var(--border2);
-  border-radius: 7px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
   position: relative;
+  overflow: hidden;
 }
 .item-card-hdr {
   display: flex;
@@ -178,8 +179,66 @@ body {
   justify-content: space-between;
   font-size: 11px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--text);
+  padding: 8px 10px;
+  background: #0f1423;
+  border-bottom: 1px solid var(--border);
 }
+.item-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+.item-title-text {
+  color: var(--muted);
+  font-weight: 600;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-badge {
+  background: rgba(61,125,245,0.18);
+  color: var(--accent2);
+  border: 1px solid rgba(61,125,245,0.35);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  letter-spacing: 0.3px;
+}
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.item-toggle {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+.item-toggle.open {
+  color: var(--accent2);
+  border-color: var(--accent2);
+  background: rgba(61,125,245,0.08);
+}
+.item-card-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.item-card.collapsed .item-card-body { display: none; }
+.item-card.collapsed .item-toggle { transform: rotate(-90deg); }
 .btn-rm {
   background: rgba(239,68,68,0.15);
   color: var(--danger);
@@ -685,7 +744,7 @@ const D = {
     state:     'Gujarat'
   },
   items: [
-    { name:'Sand', desc:'Sand', qty:35, unit:'TON', rate:1000, cgst:2.5, sgst:2.5 }
+    { name:'Sand', desc:'Sand', qty:35, unit:'TON', rate:1000, cgst:2.5, sgst:2.5, collapsed:false }
   ],
   bank: {
     accName:'Jay Mahakali Earth Movers',
@@ -763,37 +822,46 @@ function renderItemsList() {
   el.innerHTML = '';
   D.items.forEach((it, i) => {
     const d = document.createElement('div');
-    d.className = 'item-card';
+    const collapsed = Boolean(it.collapsed);
+    const toggleIcon = collapsed ? '▸' : '▾';
+    const toggleClass = collapsed ? '' : 'open';
+    d.className = `item-card${collapsed ? ' collapsed' : ''}`;
     d.innerHTML = `
       <div class="item-card-hdr">
-        Item #${i+1}
-        ${D.items.length > 1 ? `<button class="btn-rm" onclick="removeItem(${i})">✕ Remove</button>` : ''}
-      </div>
-      <div class="g2">
-        <div class="field"><label>Product Name</label>
-          <input type="text" value="${esc(it.name)}" oninput="upd(${i},'name',this.value)">
+        <div class="item-card-title">
+          <span class="item-badge">Item #${i+1}</span>
+          <span class="item-title-text" id="itemTitle-${i}">${esc(it.name) || 'New Item'}</span>
         </div>
-        <div class="field"><label>Description / HSN</label>
-          <input type="text" value="${esc(it.desc)}" oninput="upd(${i},'desc',this.value)">
+        <div class="item-actions">
+          <button class="item-toggle ${toggleClass}" onclick="toggleItem(${i})" aria-label="Toggle item" aria-expanded="${!collapsed}">${toggleIcon}</button>
+          ${D.items.length > 1 ? `<button class="btn-rm" onclick="removeItem(${i})">✕ Remove</button>` : ''}
         </div>
       </div>
-      <div class="g3">
-        <div class="field"><label>Qty</label>
-          <input type="number" value="${it.qty}" oninput="upd(${i},'qty',+this.value)">
+      <div class="item-card-body">
+        <div class="g2">
+          <div class="field"><label>Product Name</label>
+            <input type="text" value="${esc(it.name)}" oninput="upd(${i},'name',this.value)">
+          </div>
+          <div class="field"><label>Description / HSN</label>
+            <input type="text" value="${esc(it.desc)}" oninput="upd(${i},'desc',this.value)">
+          </div>
         </div>
-        <div class="field"><label>Unit</label>
-          <input type="text" value="${esc(it.unit)}" oninput="upd(${i},'unit',this.value)">
-        </div>
-        <div class="field"><label>Rate ₹</label>
-          <input type="number" value="${it.rate}" oninput="upd(${i},'rate',+this.value)">
-        </div>
-      </div>
-      <div class="g2">
-        <div class="field"><label>CGST %</label>
-          <input type="number" step="0.5" value="${it.cgst}" oninput="upd(${i},'cgst',+this.value)">
-        </div>
-        <div class="field"><label>SGST %</label>
-          <input type="number" step="0.5" value="${it.sgst}" oninput="upd(${i},'sgst',+this.value)">
+        <div class="g5">
+          <div class="field"><label>Qty</label>
+            <input type="number" value="${it.qty}" oninput="upd(${i},'qty',+this.value)">
+          </div>
+          <div class="field"><label>Unit</label>
+            <input type="text" value="${esc(it.unit)}" oninput="upd(${i},'unit',this.value)">
+          </div>
+          <div class="field"><label>Rate ₹</label>
+            <input type="number" value="${it.rate}" oninput="upd(${i},'rate',+this.value)">
+          </div>
+          <div class="field"><label>CGST %</label>
+            <input type="number" step="0.5" value="${it.cgst}" oninput="upd(${i},'cgst',+this.value)">
+          </div>
+          <div class="field"><label>SGST %</label>
+            <input type="number" step="0.5" value="${it.sgst}" oninput="upd(${i},'sgst',+this.value)">
+          </div>
         </div>
       </div>
     `;
@@ -801,10 +869,19 @@ function renderItemsList() {
   });
 }
 
-function upd(i, k, v) { D.items[i][k] = v; render(); }
+function upd(i, k, v) {
+  D.items[i][k] = v;
+  if (k === 'name') updateItemTitle(i, v);
+  render();
+}
+
+function updateItemTitle(i, name) {
+  const el = document.getElementById(`itemTitle-${i}`);
+  if (el) el.textContent = name || 'New Item';
+}
 
 function addItem() {
-  D.items.push({ name:'', desc:'', qty:1, unit:'TON', rate:0, cgst:2.5, sgst:2.5 });
+  D.items.push({ name:'', desc:'', qty:1, unit:'TON', rate:0, cgst:2.5, sgst:2.5, collapsed:false });
   renderItemsList();
   render();
 }
@@ -813,6 +890,11 @@ function removeItem(i) {
   D.items.splice(i, 1);
   renderItemsList();
   render();
+}
+
+function toggleItem(i) {
+  D.items[i].collapsed = !D.items[i].collapsed;
+  renderItemsList();
 }
 
 function esc(s) { return String(s||'').replace(/"/g,'&quot;'); }
