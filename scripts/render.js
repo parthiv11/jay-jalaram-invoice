@@ -65,7 +65,7 @@ export function render() {
   const b = D.buyer;
   const bk = D.bank;
 
-  document.getElementById('invoice').innerHTML = `
+  const invoiceHtml = `
     <div class="inv-thankyou">🙏 Thank-you for doing business with us</div>
 
     <div class="inv-sheet">
@@ -191,4 +191,5 @@ export function render() {
 
     <div class="inv-thanks">Thankyou for your business</div>
   `;
+  document.getElementById('invoice').innerHTML = DOMPurify.sanitize(invoiceHtml);
 }
