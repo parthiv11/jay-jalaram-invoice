@@ -10,9 +10,7 @@ const legacyMarkup = `
     </div>
   </div>
   <div class="btn-group">
-    <button class="btn btn-print" onclick="window.print()">🖨 Print / PDF</button>
     <button class="btn btn-pdf" onclick="downloadPDF()">⬇ Save PDF</button>
-    <button class="btn btn-excel" onclick="downloadExcel()">📊 Export Excel</button>
   </div>
 </div>
 
@@ -139,7 +137,6 @@ export default function InvoiceBuilderPage() {
   return (
     <>
       <div dangerouslySetInnerHTML={{ __html: legacyMarkup }} />
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" strategy="afterInteractive" />
       <Script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.4/dist/purify.min.js" strategy="afterInteractive" />
       <Script src="/scripts/app.js" type="module" strategy="afterInteractive" />
     </>
