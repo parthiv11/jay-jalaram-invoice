@@ -1,24 +1,20 @@
 {
   "name": "jay-jalaram-invoice",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/parthiv11/jay-jalaram-invoice.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/parthiv11/jay-jalaram-invoice/issues"
-  },
-  "homepage": "https://github.com/parthiv11/jay-jalaram-invoice#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6"
   }
 }
