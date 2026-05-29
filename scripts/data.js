@@ -1,6 +1,6 @@
 export const D = {
   seller: {
-    name: 'JAY MAHAKALI EARTH MOVERS',
+    name: 'JALARAM TRADERS',
     address: 'GOLIBAR MALAV ROAD KALOL, Panchmahals, Gujarat, 389330',
     phone: '9825468621',
     gstin: '24AHHPV8596L1ZB',
@@ -25,7 +25,7 @@ export const D = {
     { name: 'Sand', desc: 'Sand', qty: 35, unit: 'TON', rate: 1000, cgst: 2.5, sgst: 2.5, collapsed: false }
   ],
   bank: {
-    accName: 'Jay Mahakali Earth Movers',
+    accName: 'Jalaram Traders',
     accNo: '50200027797355',
     ifsc: 'HDFC0000954',
     bank: 'HDFC Bank',

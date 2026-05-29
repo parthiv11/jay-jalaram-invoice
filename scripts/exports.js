@@ -3,61 +3,70 @@ import { calcItem, calcTotals } from './calculations.js';
 import { n2w } from './utils.js';
 
 export function downloadPDF() {
-  const inv = document.getElementById('invoice').innerHTML;
+  const inv = document.getElementById('invoice').outerHTML;
   const w = window.open('', '_blank', 'width=900,height=750');
+  if (!w) return;
   w.document.write(`<!DOCTYPE html><html><head>
   <meta charset="UTF-8">
   <title>Invoice ${D.inv.number}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Arial,Helvetica,sans-serif;padding:10mm;font-size:10.5px;color:#000}
-    .inv-thankyou{text-align:center;font-size:9.5px;color:#555;margin-bottom:5px;font-style:italic}
-    .inv-header-wrap{border:1px solid #000}
-    .inv-header-top{display:grid;grid-template-columns:55% 45%;border-bottom:1px solid #000}
-    .inv-seller{padding:8px 10px;border-right:1px solid #000}
-    .inv-seller-name{font-size:14px;font-weight:bold;margin-bottom:3px}
-    .inv-seller-addr{font-size:9px;color:#333;margin-bottom:1px}
-    .inv-seller-phone{font-size:9px;margin-bottom:3px}
-    .inv-seller-meta{font-size:9px;margin-top:3px}
-    .inv-details{padding:8px 10px}
+    body{padding:10mm;background:#fff;font-family:Arial,Helvetica,sans-serif}
+    .invoice{background:#fff;width:750px;min-height:1060px;padding:14px 16px 16px;font-size:10.5px;color:#000;line-height:1.4;margin:0 auto}
+    .inv-thankyou{text-align:center;font-size:9.5px;color:#444;margin-bottom:6px;font-style:italic;letter-spacing:.2px}
+    .inv-sheet{border:2px solid #000}
+    .inv-header-wrap{padding:10px 12px 8px;text-align:center;border-bottom:1.5px solid #000}
+    .inv-seller-name{font-size:16px;font-weight:bold;margin-bottom:4px;line-height:1.2}
+    .inv-seller-addr{font-size:10px;color:#333;margin-bottom:2px}
+    .inv-seller-phone{font-size:10px;font-weight:600;margin:3px 0 4px}
+    .inv-seller-meta{font-size:9.5px;margin-top:3px}
+    .state-chip{display:inline-block;border:1px solid #000;padding:1px 6px;border-radius:4px;margin-left:6px;font-size:9px}
+    .inv-type-row{background:#d9ebff;border-bottom:1px solid #000;padding:6px 10px;text-align:center;position:relative}
+    .inv-type-title{font-size:16px;font-weight:bold;letter-spacing:1px}
+    .inv-type-note{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:italic;font-size:10px}
+    .inv-meta{display:grid;grid-template-columns:55% 45%;border-bottom:1px solid #000}
+    .inv-meta-left{padding:6px 10px}
+    .inv-meta-right{padding:6px 10px;border-left:1px solid #000;display:flex;align-items:flex-start;justify-content:space-between}
+    .inv-meta-row{display:flex;justify-content:space-between;gap:10px;font-size:10px;font-weight:600;width:100%}
+    .inv-meta-row .val{font-weight:700}
     .inv-dtable{width:100%;font-size:9.5px;border-collapse:collapse}
-    .inv-dtable td{padding:2px 3px;vertical-align:top}
-    .inv-dtable td:first-child{font-weight:bold;white-space:nowrap;width:48%}
-    .inv-receiver{border:1px solid #000;border-top:none}
-    .inv-receiver-title{font-weight:bold;font-size:10px;padding:3px 8px;background:#f0f0f0;border-bottom:1px solid #000}
-    .inv-receiver-body{padding:5px 8px}
+    .inv-dtable tr td{padding:2px 3px;vertical-align:top}
+    .inv-dtable tr td:first-child{font-weight:600;white-space:nowrap;width:58%}
+    .inv-dtable tr td:last-child{font-weight:700;text-align:right}
+    .inv-receiver{border-bottom:1px solid #000}
+    .inv-receiver-title{font-weight:bold;font-size:10.5px;padding:4px 8px;background:#d9ebff;border-bottom:1px solid #000;text-align:center}
+    .inv-receiver-body{padding:6px 10px}
     .inv-rgrid{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:9.5px}
     .inv-rgrid .lbl{font-weight:bold;white-space:nowrap}
-    .inv-items{width:100%;border-collapse:collapse;font-size:9.5px}
+    .inv-items{width:100%;border-collapse:collapse;font-size:9.5px;border-bottom:1px solid #000}
     .inv-items th,.inv-items td{border:1px solid #000;padding:3px 5px;text-align:center;vertical-align:middle}
-    .inv-items th{background:#f5f5f5;font-weight:bold;font-size:9px;line-height:1.3}
+    .inv-items th{background:#d9ebff;font-weight:bold;font-size:9px;line-height:1.3}
     .inv-items td.al{text-align:left}
     .inv-items td.ar{text-align:right}
-    .inv-items tfoot td{font-weight:bold;background:#fafafa}
-    .inv-bottom{border:1px solid #000;border-top:none;display:grid;grid-template-columns:55% 45%}
+    .inv-items td.taxable-col{background:#d9ebff;font-weight:600}
+    .inv-items tfoot td{font-weight:bold;background:#d9ebff}
+    .inv-bottom{border-bottom:1px solid #000;display:grid;grid-template-columns:55% 45%}
     .inv-words-bank{padding:7px 10px;border-right:1px solid #000;font-size:9.5px}
-    .inv-words-label{font-weight:bold;font-size:10px}
-    .inv-words-text{font-style:italic;margin-top:2px;font-size:9px}
-    .inv-bank-title{font-weight:bold;font-size:9.5px;margin-top:8px;margin-bottom:4px}
+    .inv-words-label{font-weight:bold;font-size:10px;text-align:center}
+    .inv-words-text{font-weight:700;margin-top:2px;font-size:10px;text-align:center}
+    .inv-bank-title{font-weight:bold;font-size:10px;margin-top:8px;margin-bottom:4px;color:#1e5aa7;display:flex;align-items:center;gap:5px}
     .inv-bgrid{display:grid;grid-template-columns:auto 1fr;gap:2px 6px;font-size:9px}
     .inv-bgrid .lbl{font-weight:bold}
-    .inv-summary{padding:7px 10px;font-size:9.5px}
+    .inv-summary{padding:0;font-size:9.5px}
     .inv-stbl{width:100%;border-collapse:collapse}
-    .inv-stbl td{padding:2px 2px;vertical-align:middle}
+    .inv-stbl td{padding:4px 6px;vertical-align:middle;border:1px solid #000}
     .inv-stbl td:last-child{text-align:right;font-weight:bold;white-space:nowrap}
-    .inv-stbl .sep td{border-top:1px solid #888}
-    .inv-stbl .bsep td{border-top:1.5px solid #000;font-weight:bold;font-size:10px}
-    .inv-stbl .bal td{color:#cc0000;font-weight:bold}
-    .inv-footer{border:1px solid #000;border-top:none;display:grid;grid-template-columns:55% 45%}
+    .inv-stbl .head td,.inv-stbl .total td,.inv-stbl .final td{background:#d9ebff;font-weight:bold}
+    .inv-stbl .bal td{font-weight:bold}
+    .inv-footer{display:grid;grid-template-columns:55% 45%}
     .inv-terms{padding:7px 10px;border-right:1px solid #000;font-size:9px;line-height:1.5}
     .inv-terms-title{font-weight:bold;margin-bottom:4px;font-size:9.5px}
-    .inv-certified{margin-top:6px;font-style:italic;font-size:8.5px;color:#444}
-    .inv-signatory{padding:7px 10px;text-align:right;font-size:9.5px;display:flex;flex-direction:column;justify-content:space-between}
+    .inv-certified{margin-bottom:6px;font-size:8.5px;color:#444;text-align:left;font-style:italic}
+    .inv-signatory{padding:7px 10px;text-align:center;font-size:9.5px;display:flex;flex-direction:column;justify-content:space-between}
     .inv-sig-co{font-weight:bold;font-size:10px}
     .inv-sig-space{height:38px}
     .inv-sig-label{font-size:9px;color:#444}
-    .inv-thanks{font-size:8.5px;color:#666;margin-top:3px}
-    .inv-type-badge{text-align:center;font-weight:bold;font-size:11px;padding:5px;border:1px solid #000;border-top:none;background:#f5f5f5;letter-spacing:1px}
+    .inv-thanks{font-size:9px;color:#444;margin-top:6px;text-align:center;font-style:italic}
     @page{margin:10mm;size:A4}
   </style>
   </head><body>${inv}
