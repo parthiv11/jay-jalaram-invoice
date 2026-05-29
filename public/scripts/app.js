@@ -2,7 +2,7 @@ import { D } from './data.js';
 import { set } from './utils.js';
 import { render } from './render.js';
 import { renderItemsList, addItem, removeItem, toggleItem, upd } from './items.js';
-import { downloadPDF, downloadExcel } from './exports.js';
+import { downloadPDF } from './exports.js';
 import { toggleSec } from './sections.js';
 
 function initForm() {
@@ -46,7 +46,6 @@ function exposeGlobals() {
   window.upd = upd;
   window.toggleSec = toggleSec;
   window.downloadPDF = downloadPDF;
-  window.downloadExcel = downloadExcel;
 }
 
 exposeGlobals();
