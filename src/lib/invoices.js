@@ -5,14 +5,6 @@ const DATA_DIRECTORY = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIRECTORY, "invoices.json");
 const FIRST_INVOICE_NUMBER = 1000;
 
-export const defaultProducts = [
-  "Dining Table",
-  "Office Chair",
-  "Sofa Set",
-  "Bed Frame",
-  "Cupboard",
-];
-
 export class ValidationError extends Error {
   constructor(message) {
     super(message);

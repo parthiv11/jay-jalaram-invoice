@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { defaultProducts } from "@/lib/invoices";
+import { defaultProducts } from "@/lib/invoice-defaults";
 
 const parseNumber = (value) => {
   const parsed = Number.parseFloat(value);
@@ -32,6 +32,7 @@ export default function InvoiceBuilderPage() {
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [reloadToken, setReloadToken] = useState(0);
 
   const totals = useMemo(() => {
     const subtotal = lineItems.reduce(
@@ -75,33 +76,53 @@ export default function InvoiceBuilderPage() {
     return invoices.filter((invoice) => invoice.customerName === selectedCustomer);
   }, [invoices, selectedCustomer]);
 
-  const loadInvoices = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/invoices", { cache: "no-store" });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Unable to load invoices.");
-      }
-
-      setInvoices(data.invoices || []);
-      setInvoiceNumber(data.nextInvoiceNumber || "INV-1000");
-      setStatus((currentStatus) =>
-        currentStatus.type === "success" ? currentStatus : { type: "", message: "" },
-      );
-    } catch (error) {
-      setStatus({ type: "error", message: error.message });
-      setInvoiceNumber("Unavailable");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadInvoices();
-  }, []);
+    let isActive = true;
+
+    const loadInvoices = async () => {
+      setIsLoading(true);
+
+      try {
+        const response = await fetch("/api/invoices", { cache: "no-store" });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to load invoices.");
+        }
+
+        if (!isActive) {
+          return;
+        }
+
+        setInvoices(data.invoices || []);
+        setInvoiceNumber(data.nextInvoiceNumber || "INV-1000");
+        setStatus((currentStatus) =>
+          currentStatus.type === "success" ? currentStatus : { type: "", message: "" },
+        );
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+
+        setStatus({ type: "error", message: error.message });
+        setInvoiceNumber("Unavailable");
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadInvoices();
+
+    return () => {
+      isActive = false;
+    };
+  }, [reloadToken]);
+
+  const refreshInvoices = () => {
+    setReloadToken((currentReloadToken) => currentReloadToken + 1);
+  };
 
   const updateLineItem = (lineItemId, fieldName, value) => {
     setLineItems((currentLineItems) =>
@@ -397,7 +418,7 @@ export default function InvoiceBuilderPage() {
         <section aria-labelledby="history-heading" className="card history-card">
           <div className="section-header">
             <h2 id="history-heading">Customer invoice history</h2>
-            <button className="button secondary" onClick={loadInvoices} type="button">
+            <button className="button secondary" onClick={refreshInvoices} type="button">
               Refresh
             </button>
           </div>

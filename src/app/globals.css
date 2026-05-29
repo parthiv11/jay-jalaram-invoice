@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   --bg: #f5f7fb;
   --surface: #ffffff;
   --primary: #1155cc;
