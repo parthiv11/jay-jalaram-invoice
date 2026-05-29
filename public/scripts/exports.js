@@ -11,8 +11,8 @@ export function downloadPDF() {
   <title>Invoice ${D.inv.number}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{padding:10mm;background:#fff;font-family:Arial,Helvetica,sans-serif}
-    .invoice{background:#fff;width:750px;min-height:1060px;padding:14px 16px 16px;font-size:10.5px;color:#000;line-height:1.4;margin:0 auto}
+    body{margin:0;background:#fff;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .invoice{background:#fff;width:190mm;min-height:auto;padding:14px 16px 16px;font-size:10.5px;color:#000;line-height:1.4;margin:0 auto}
     .inv-thankyou{text-align:center;font-size:9.5px;color:#444;margin-bottom:6px;font-style:italic;letter-spacing:.2px}
     .inv-sheet{border:2px solid #000}
     .inv-header-wrap{padding:10px 12px 8px;text-align:center;border-bottom:1.5px solid #000}
