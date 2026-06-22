@@ -1,9 +1,8 @@
 import { D } from './data.js';
 import { set } from './utils.js';
-import { render } from './render.js';
+import { render, getInvoicePayload } from './render.js';
 import { renderItemsList, addItem, removeItem, toggleItem, upd } from './items.js';
-import { downloadPDF } from './exports.js';
-import { toggleSec } from './sections.js';
+import { toggleSec, initSections } from './sections.js';
 
 function initForm() {
   const s = D.seller;
@@ -38,6 +37,20 @@ function initForm() {
   render();
 }
 
+function setView(view) {
+  document.body.dataset.view = view;
+
+  document.querySelectorAll('.view-tab, .mobile-bar-tab').forEach((tab) => {
+    const isActive = tab.dataset.view === view;
+    tab.classList.toggle('active', isActive);
+    if (tab.matches('.view-tab')) {
+      tab.setAttribute('aria-selected', String(isActive));
+    }
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function exposeGlobals() {
   window.render = render;
   window.addItem = addItem;
@@ -45,8 +58,30 @@ function exposeGlobals() {
   window.toggleItem = toggleItem;
   window.upd = upd;
   window.toggleSec = toggleSec;
-  window.downloadPDF = downloadPDF;
+  window.getInvoicePayload = getInvoicePayload;
+  window.setView = setView;
+  window.downloadPDF =
+    window.downloadPDF ||
+    (() => alert("PDF download is still loading. Please try again in a moment."));
+}
+
+function initSectionsForViewport() {
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+
+  document.querySelectorAll('.section').forEach((section) => {
+    if (!isMobile) {
+      section.classList.add('section-open');
+    }
+  });
+
+  initSections();
 }
 
 exposeGlobals();
 initForm();
+initSectionsForViewport();
+setView('edit');
+
+window.addEventListener('resize', () => {
+  initSectionsForViewport();
+});

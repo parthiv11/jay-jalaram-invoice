@@ -4,7 +4,7 @@ const fmt = n => Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits:
 
 let requestId = 0;
 
-function collect() {
+export function collect() {
   const g = id => document.getElementById(id).value;
   D.seller.name = g('sName');
   D.seller.address = g('sAddr');
@@ -32,13 +32,23 @@ function collect() {
   D.paid = parseFloat(g('amtPaid')) || 0;
 }
 
+export function getInvoicePayload() {
+  collect();
+  return structuredClone(D);
+}
+
 const updateTotals = totals => {
+  const finalText = '₹ ' + fmt(totals.final);
+
   document.getElementById('tTaxable').textContent = '₹ ' + fmt(totals.taxable);
   document.getElementById('tCgst').textContent = '₹ ' + fmt(totals.cgst);
   document.getElementById('tSgst').textContent = '₹ ' + fmt(totals.sgst);
   document.getElementById('tTax').textContent = '₹ ' + fmt(totals.tax);
-  document.getElementById('tFinal').textContent = '₹ ' + fmt(totals.final);
+  document.getElementById('tFinal').textContent = finalText;
   document.getElementById('tBal').textContent = '₹ ' + fmt(totals.bal);
+
+  const topFinal = document.getElementById('topFinal');
+  if (topFinal) topFinal.textContent = finalText;
 };
 
 export async function render() {
