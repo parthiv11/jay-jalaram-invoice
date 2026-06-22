@@ -27,7 +27,7 @@ export async function POST(request) {
     console.error("Unable to generate invoice PDF", error);
 
     const message =
-      error instanceof Error && error.message.includes("Chrome")
+      error instanceof Error
         ? error.message
         : "Unable to generate invoice PDF.";
 

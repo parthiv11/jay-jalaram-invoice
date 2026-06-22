@@ -35,11 +35,20 @@ async function launchBrowser() {
   if (IS_SERVERLESS) {
     const chromium = await import("@sparticuz/chromium");
 
+    chromium.default.setGraphicsMode = false;
+
     return puppeteer.launch({
-      args: chromium.default.args,
-      defaultViewport: chromium.default.defaultViewport,
+      args: puppeteer.defaultArgs({
+        args: chromium.default.args,
+        headless: "shell",
+      }),
+      defaultViewport: {
+        width: 794,
+        height: 1123,
+        deviceScaleFactor: 1,
+      },
       executablePath: await chromium.default.executablePath(),
-      headless: chromium.default.headless,
+      headless: "shell",
     });
   }
 
@@ -62,7 +71,7 @@ export async function generateInvoicePdf(invoiceData) {
 
   try {
     const page = await browser.newPage();
-    await page.setContent(documentHtml, { waitUntil: "networkidle0" });
+    await page.setContent(documentHtml, { waitUntil: "domcontentloaded" });
     await page.emulateMediaType("print");
 
     const pdfBuffer = await page.pdf({
