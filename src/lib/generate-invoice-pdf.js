@@ -12,6 +12,10 @@ const CHROME_CANDIDATES = [
   "/usr/bin/chromium-browser",
 ].filter(Boolean);
 
+const CHROMIUM_PACK_URL =
+  process.env.CHROMIUM_REMOTE_EXEC_PATH ||
+  "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.x64.tar";
+
 const IS_SERVERLESS = Boolean(
   process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_VERSION
 );
@@ -33,12 +37,12 @@ async function resolveLocalChrome() {
 
 async function launchBrowser() {
   if (IS_SERVERLESS) {
-    const chromium = await import("@sparticuz/chromium");
+    const chromium = await import("@sparticuz/chromium-min");
 
     chromium.default.setGraphicsMode = false;
 
     return puppeteer.launch({
-      args: puppeteer.defaultArgs({
+      args: await puppeteer.defaultArgs({
         args: chromium.default.args,
         headless: "shell",
       }),
@@ -47,7 +51,7 @@ async function launchBrowser() {
         height: 1123,
         deviceScaleFactor: 1,
       },
-      executablePath: await chromium.default.executablePath(),
+      executablePath: await chromium.default.executablePath(CHROMIUM_PACK_URL),
       headless: "shell",
     });
   }
